@@ -1,0 +1,19 @@
+language: typescript
+app: npx ts-node main.ts
+imports:
+  #  - k8s
+  - argocd:=https://raw.githubusercontent.com/argoproj/argo-cd/v2.9.3/manifests/install.yaml
+#  - gateway_crd:=https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+
+
+#  - kubectl kustomize github.com/kong/kubernetes-ingress-controller/config/crd?ref=main
+#  - kong_ingress:=https://raw.githubusercontent.com/Kong/kong-operator/main/helm-charts/kong/crds/custom-resource-definitions.yaml
+#  - kong_operator:=https://docs.konghq.com/assets/gateway-operator/v1.1.0/crds.yaml
+
+
+#  - cert:=https://github.com/cert-manager/cert-manager/releases/download/v1.12.7/cert-manager.yaml
+#  - extdns:=https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/examples/external-dns.yaml
+#  - helm:https://charts.konghq.com/ingress@0.10.1
+
+
+#  - istio:=https://raw.githubusercontent.com/istio/istio/release-1.14/manifests/charts/base/crds/crd-all.gen.yaml

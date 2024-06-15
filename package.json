@@ -1,0 +1,42 @@
+{
+  "name": "eks",
+  "version": "0.1.0",
+  "bin": {
+    "eks": "bin/eks.js"
+  },
+  "scripts": {
+    "clean": "tsc --build --clean",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "import": "cdk8s import",
+    "cdk-ls": "cross-env target_rev_ref=b:odmdSbxUsw1Gyang cdk ls --profile AdministratorAccess-590184130740",
+    "cdk-diff": "cross-env target_rev_ref=b:odmdSbxUsw1Gyang cdk diff --all --profile AdministratorAccess-590184130740",
+    "cdk-sa": "cross-env target_rev_ref=b:odmdSbxUsw1Gyang cdk synth '*' --profile AdministratorAccess-590184130740",
+    "cdk-cs": "npm run cdk-sa && aws cloudformation create-change-set --stack-name eks--gyanglz-w1-argocd --template-body file://cdk.out/eks--gyanglz-w1-argocd.template.json --change-set-name gyang1 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --profile AdministratorAccess-590184130740",
+    "kubectl": "ts-node bin/kubectl.ts"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-codecommit": "3.540.0",
+    "@aws-sdk/client-sts": "3.540.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "20.10.4",
+    "@types/base-64": "^1.0.0",
+    "aws-cdk": "2.142.1",
+    "cdk8s-cli": "2.198.65",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.3.3",
+    "@kubernetes/client-node": "^0.20.0",
+    "base-64": "^1.0.0"
+  },
+  "dependencies": {
+    "@ondemandenv/odmd-contracts": "0.1.88-o",
+    "@aws-cdk/lambda-layer-kubectl-v28": "2.2.0",
+    "aws-cdk-lib": "2.142.1",
+    "cdk8s-plus-28": "2.0.3",
+    "source-map-support": "^0.5.21"
+  }
+}
