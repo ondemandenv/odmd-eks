@@ -44,7 +44,7 @@ async function main() {
     OndemandContracts.inst.odmdBuilds.forEach(b => {
         b.envers.forEach(e => {
             const t = e as any as KubeCtlThruCentral
-            if (t && t.simpleK8s && t.simpleK8s.targetEksCluster == CurrentEnver.inst.eksCluster) {
+            if (t && t.targetEksCluster == CurrentEnver.inst.eksCluster) {//would need this only when targeting to this around central
                 //ONDEMAND_CENTRAL_REPO\lib\repo-build-pp-cdk.ts will auto delete this
                 // new KubectlSg(cdkApp, theClusterStack, t)
             }
