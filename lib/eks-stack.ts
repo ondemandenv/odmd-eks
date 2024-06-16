@@ -19,7 +19,6 @@ import {
     PolicyStatement,
     Role
 } from "aws-cdk-lib/aws-iam";
-import {KubectlV28Layer} from "@aws-cdk/lambda-layer-kubectl-v28";
 import * as eks from "aws-cdk-lib/aws-eks";
 import {ArgocdApps} from "./argocd-apps";
 import {Cluster, HelmChartOptions} from "aws-cdk-lib/aws-eks";
@@ -32,6 +31,7 @@ import {
     OndemandContracts,
     AnyContractsEnVer
 } from "@ondemandenv/odmd-contracts";
+import {KubectlV29Layer} from "@aws-cdk/lambda-layer-kubectl-v29";
 
 export class GyangEksCluster extends Stack {
     public readonly eksCluster: Cluster;
@@ -108,8 +108,8 @@ export class GyangEksCluster extends Stack {
         const pubIPs = ['67.80.162.234/32', CurrentEnver.inst.eksCluster.natPublicIP.getSharedValue(this) + '/32'];
         this.eksCluster = new eks.Cluster(this, 'gyang-tst-eks-cluster', {
             clusterName: CurrentEnver.inst.eksCluster.clusterName,
-            version: eks.KubernetesVersion.V1_28,
-            kubectlLayer: new KubectlV28Layer(this, 'kubectl'),
+            version: eks.KubernetesVersion.V1_29,
+            kubectlLayer: new KubectlV29Layer(this, 'kubectl'),
             vpc,
             secretsEncryptionKey: clusterKmsKey,
             placeClusterHandlerInVpc: true,
