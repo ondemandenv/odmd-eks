@@ -33,7 +33,7 @@
     "base-64": "^1.0.0"
   },
   "dependencies": {
-    "@ondemandenv/odmd-contracts": "0.1.88-b1",
+    "@ondemandenv/odmd-contracts": "0.1.88-b3",
     "@aws-cdk/lambda-layer-kubectl-v29": "2.1.0",
     "aws-cdk-lib": "2.142.1",
     "cdk8s-plus-28": "2.0.3",
