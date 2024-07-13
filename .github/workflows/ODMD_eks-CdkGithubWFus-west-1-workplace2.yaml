@@ -4,8 +4,6 @@ name: ODMD_eks-CdkGithubWFus-west-1-workplace2
 on:
   workflow_dispatch:
     inputs:
-      target_rev_ref:
-        description: 'Tag or revision/SHA to checkout'
       aws_credentials:
         type: string
         description: | 
@@ -21,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.ref }}
       - uses: ondemandenv/build@main
         with:
           aws_credentials: ${{github.event.inputs.aws_credentials}}
@@ -33,4 +31,4 @@ jobs:
           ODMD_awsRegion: us-west-1
           ODMD_AWS_CREDENTIALS: ${{ secrets['ODMD_AWS_CREDENTIALS_ODMD_eks_CdkGithubWFus_west_1_workplace2'] }}
 
-#3
+#
