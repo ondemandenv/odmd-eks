@@ -29,6 +29,6 @@ jobs:
           ODMD_workDirs: .
           ODMD_buildType: CdkGithubWF
           ODMD_awsRegion: us-west-1
-          ODMD_AWS_CREDENTIALS: ${{ secrets['ODMD_AWS_CREDENTIALS_ODMD_eks_CdkGithubWFus_west_1_workplace2'] }}
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_CdkGithubWFus_west_1_workplace2'] }}
 
 #
