@@ -2,15 +2,6 @@ import * as k8s from "@kubernetes/client-node"
 import * as b64 from "base-64"
 import {execSync} from 'child_process';
 
-
-
-
-process.env.CDK_CLI_VERSION = '2.114.1'
-process.env.CDK_DEFAULT_ACCOUNT = '590184130740'
-process.env.target_rev_ref = 'b:odmdSbxUsw1Gyang'
-process.env.CDK_DEFAULT_REGION = 'us-west-1'
-
-
 import * as net from "net";
 import {CurrentEnver} from "./current-enver";
 import {App} from "aws-cdk-lib";

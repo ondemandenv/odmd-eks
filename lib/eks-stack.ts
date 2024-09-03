@@ -259,7 +259,7 @@ export class GyangEksCluster extends Stack {
             [CurrentEnver.inst.eksCluster.clusterEndpoint, this.eksCluster.clusterEndpoint],
             [CurrentEnver.inst.eksCluster.argocdRepoSa, CurrentEnver.inst.localConfig.argocdRepoSA!],
             [CurrentEnver.inst.eksCluster.argocdRepoName, this.argocdRepo.repositoryName],
-            [CurrentEnver.inst.eksCluster.clusterIpv4Cidr, vpc.vpcCidrBlock],
+            [CurrentEnver.inst.eksCluster.vpcCidr, vpc.vpcCidrBlock],
             [CurrentEnver.inst.eksCluster.kubectlRoleArn, this.eksCluster.kubectlRole!.roleArn]
         ]))
 

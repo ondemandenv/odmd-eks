@@ -33,7 +33,7 @@ export class CurrentEnver {
         if (revref.includes('@')) {
             revref = revref.split('@')[0]
         }
-        revref = revref.startsWith('b:') ? revref.substring(2) : revref.replace(/:/, '_')
+        revref = revref.substring(3)
         const {EnverConfigImpl} = await import( (`./app-envers/${revref}`) )
 
         this._inst = new CurrentEnver(new EnverConfigImpl() as AppEnverConfig)
