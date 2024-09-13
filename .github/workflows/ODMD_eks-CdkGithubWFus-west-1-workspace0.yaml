@@ -1,0 +1,38 @@
+#ODMD GENERATED WORKFLOW, don't change unless you are sure
+
+name: ODMD_eks-CdkGithubWFus-west-1-workspace0
+on:
+  workflow_dispatch:
+    inputs:
+      aws_credentials:
+        type: string
+        description: | 
+          Your AWS credentials in the format:
+          [0123456789_MyRole_profile]
+          aws_access_key_id=01234_id
+          aws_secret_access_key=56689_secret
+          aws_session_token=token0123456789
+      message:
+        type: string
+        description: additional message
+jobs:
+  odmd_job:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+      - uses: ondemandenv/build@main
+        with:
+          aws_credentials: ${{github.event.inputs.aws_credentials}}
+          trigger_message: ${{github.event.inputs.message}}
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ODMD_buildId: eks
+          ODMD_workDirs: .
+          ODMD_buildType: CdkGithubWF
+          ODMD_awsRegion: us-west-1
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_CdkGithubWFus_west_1_workspace0'] }}
+
+#
