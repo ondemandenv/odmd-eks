@@ -8,7 +8,7 @@ on:
         type: string
         description: | 
           Your AWS credentials in the format:
-          [0123456789_MyRole_profile]
+          [workspace0_Role/Profile]
           aws_access_key_id=01234_id
           aws_secret_access_key=56689_secret
           aws_session_token=token0123456789
@@ -23,16 +23,30 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
-      - uses: ondemandenv/build@main
+      
+      - uses: ondemandenv/wflact-resolvEnvars@main
         with:
           aws_credentials: ${{github.event.inputs.aws_credentials}}
           trigger_message: ${{github.event.inputs.message}}
         env:
+          ODMD_buildId: eks
+          ODMD_awsRegion: us-west-1
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_CdkGithubWFus_west_1_workspace0'] }}
+      
+      - run: |
+          set -ex
+          cd ${{ env.ODMD_work_dir }}
+          env | grep -i ^ODMD
+          ${{ env.ODMD_entry_cmd }} || echo 'continue anyway ...'
+        env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           ODMD_buildId: eks
-          ODMD_workDirs: .
-          ODMD_buildType: CdkGithubWF
-          ODMD_awsRegion: us-west-1
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_CdkGithubWFus_west_1_workspace0'] }}      
+          
+      - uses: ondemandenv/wflact-buildProduces@main
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ODMD_buildId: eks
           ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_CdkGithubWFus_west_1_workspace0'] }}
 
 #
