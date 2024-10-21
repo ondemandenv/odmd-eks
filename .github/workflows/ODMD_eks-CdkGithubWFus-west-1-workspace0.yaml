@@ -37,7 +37,14 @@ jobs:
           set -ex
           cd ${{ env.ODMD_work_dir }}
           env | grep -i ^ODMD
-          ${{ env.ODMD_entry_cmd }} || echo 'continue anyway ...'
+          
+          if [ -f ${{ env.ODMD_entry_cmd }} ]; then
+            chmod +x ${{ env.ODMD_entry_cmd }}
+            ./${{ env.ODMD_entry_cmd }}
+          else
+            echo "${{ env.ODMD_entry_cmd }} does not exist, continue ..."
+          fi
+          
         env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           ODMD_buildId: eks
