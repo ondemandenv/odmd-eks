@@ -1,0 +1,71 @@
+#ODMD GENERATED WORKFLOW, don't change unless you are sure
+
+name: ODMD_eks-cluster-sbx-CdkGithubWFus-west-1-workspace0
+on:
+  workflow_dispatch:
+    inputs:
+      aws_credentials:
+        type: string
+        required: false
+        default: ''
+        description: | 
+          Your AWS credentials in the format:
+          [workspace0_Role/Profile]
+          aws_access_key_id=01234_id
+          aws_secret_access_key=56689_secret
+          aws_session_token=token0123456789
+      message:
+        type: string
+        required: false
+        default: ''
+        description: 'additional message'
+      ghWflPpStackName:
+        type: string
+        required: false
+        default: ''
+        description: 'the stack to reload, ignored by default'
+jobs:
+  odmd_job:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+      
+      - uses: ondemandenv/wflact-resolvEnvars@main
+        with:
+          aws_credentials: ${{github.event.inputs.aws_credentials}}
+          trigger_message: ${{github.event.inputs.message}}
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ODMD_buildId: eks-cluster-sbx
+          ODMD_awsRegion: us-west-1
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_cluster_sbx_CdkGithubWFus_west_1_workspace0'] }}
+      
+      - name: run enver local script
+        run: |
+          set -ex
+          cd ${{ env.ODMD_work_dir }}
+          env | grep -i ^ODMD
+          pwd
+          
+          if [ -f ${{ env.ODMD_buildScript }} ]; then
+            chmod +x ${{ env.ODMD_buildScript }}
+            ./${{ env.ODMD_buildScript }}
+          else
+            echo "${{ env.ODMD_buildScript }} does not exist, continue ..."
+          fi
+          
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ODMD_buildId: eks-cluster-sbx
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_cluster_sbx_CdkGithubWFus_west_1_workspace0'] }}      
+          
+      - uses: ondemandenv/wflact-buildProduces@main
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ODMD_buildId: eks-cluster-sbx
+          ODMD_SECRETS: ${{ secrets['ODMD_SECRETS_ODMD_eks_cluster_sbx_CdkGithubWFus_west_1_workspace0'] }}
+
+#
