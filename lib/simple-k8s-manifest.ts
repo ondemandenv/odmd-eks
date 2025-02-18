@@ -1,6 +1,8 @@
 import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import {Cluster} from "aws-cdk-lib/aws-eks";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb'; // Import DynamoDB module
 
 
 
@@ -18,6 +20,15 @@ export class SimpleK8sManifestStack extends Stack {
                 name: 'my-app-namespace',
             },
         });
+
+        // Load  image version from Parameter Store
+        const imageAndVersion = StringParameter.valueForStringParameter(this, '/my-app/nginx-image-and-version');
+
+        // Define DynamoDB Table
+        const dynamoTable = new dynamodb.Table(this, 'MyAppTable', {
+            partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+        });
+
 
         const appDeployment = cluster.addManifest('app-deployment', {
             apiVersion: 'apps/v1',
@@ -43,8 +54,14 @@ export class SimpleK8sManifestStack extends Stack {
                         containers: [
                             {
                                 name: 'my-app-container',
-                                image: 'nginx:latest',
+                                image: `${imageAndVersion}`,
                                 ports: [{ containerPort: 80 }],
+                                env: [
+                                    {
+                                        name: 'DYNAMODB_TABLE_NAME',
+                                        value: dynamoTable.tableName
+                                    },
+                                ],
                             },
                         ],
                     },
