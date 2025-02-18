@@ -20,14 +20,11 @@ import {
     Role
 } from "aws-cdk-lib/aws-iam";
 import * as eks from "aws-cdk-lib/aws-eks";
-import {Cluster, HelmChartOptions} from "aws-cdk-lib/aws-eks";
-import {Repository} from "aws-cdk-lib/aws-codecommit";
+import {Cluster} from "aws-cdk-lib/aws-eks";
 import {
     OdmdCrossRefProducer,
     OdmdShareOut,
-    OdmdNames,
-    OndemandContracts,
-    AnyOdmdEnVer, OdmdEnverEksCluster
+    OdmdEnverEksCluster
 } from "@ondemandenv/contracts-lib-base";
 import {KubectlV31Layer} from "@aws-cdk/lambda-layer-kubectl-v31";
 import {OndemandContractsSandbox} from "@ondemandenv/odmd-contracts-sandbox";
