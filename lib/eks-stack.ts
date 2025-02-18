@@ -20,36 +20,34 @@ import {
     Role
 } from "aws-cdk-lib/aws-iam";
 import * as eks from "aws-cdk-lib/aws-eks";
-import {ArgocdApps} from "./argocd-apps";
 import {Cluster, HelmChartOptions} from "aws-cdk-lib/aws-eks";
-import {CurrentEnver} from "../bin/current-enver";
 import {Repository} from "aws-cdk-lib/aws-codecommit";
 import {
-    ContractsCrossRefProducer,
-    ContractsShareOut,
+    OdmdCrossRefProducer,
+    OdmdShareOut,
     OdmdNames,
     OndemandContracts,
-    AnyContractsEnVer
-} from "@ondemandenv/odmd-contracts";
-import {KubectlV29Layer} from "@aws-cdk/lambda-layer-kubectl-v29";
+    AnyOdmdEnVer, OdmdEnverEksCluster
+} from "@ondemandenv/contracts-lib-base";
+import {KubectlV31Layer} from "@aws-cdk/lambda-layer-kubectl-v31";
+import {OndemandContractsSandbox} from "@ondemandenv/odmd-contracts-sandbox";
+import {EksClusterEnverSbx} from "@ondemandenv/odmd-contracts-sandbox/lib/repos/_eks/odmd-build-eks-sbx";
 
 export class GyangEksCluster extends Stack {
     public readonly eksCluster: Cluster;
-    private argocdApps: ArgocdApps;
-    public readonly argoDefHelmOptions: HelmChartOptions;
-    public readonly argocdRepo: Repository
-    public readonly argocdRepoName: string;
 
     constructor(scope: Construct, id: string, props: StackProps) {
         super(scope, id, props);
+
+        const myEnver = OndemandContractsSandbox.inst.getTargetEnver() as EksClusterEnverSbx
 
         const clusterKmsKey = new Key(this, 'ekskmskey', {
             enableKeyRotation: true,
             alias: this.stackName + '/eks-kms',
         });
 
-        const ipamWest1Le = OndemandContracts.inst.networking.ipam_west1_le;
-        const ipv4IpamPoolId = CurrentEnver.inst.eksCluster.ipamPoolName.getSharedValue(this)
+        const ipamWest1Le = OndemandContractsSandbox.inst.networking!.ipam_west1_le;
+        const ipv4IpamPoolId = myEnver.ipamPoolName.getSharedValue(this)
         const vpc = new Vpc(this, 'gyang-tst-vpc', {
             ipAddresses: IpAddresses.awsIpamAllocation({
                 ipv4IpamPoolId,
@@ -88,7 +86,7 @@ export class GyangEksCluster extends Stack {
 
         const tgwAttach = new CfnTransitGatewayAttachment(this, 'tgwAttach', {
             vpcId: vpc.vpcId, subnetIds: Array.from(azToSbs.values()).map(s => s[0].subnetId),
-            transitGatewayId: CurrentEnver.inst.eksCluster.transitGatewayShareName.getSharedValue(this)
+            transitGatewayId: myEnver.transitGatewayShareName.getSharedValue(this)
         })
 
         vpc.privateSubnets.forEach((s, si) => {
@@ -102,21 +100,21 @@ export class GyangEksCluster extends Stack {
             })
         })
 
-        const gyangAdm = Role.fromRoleName(this, 'gyang-admin', 'AWSReservedSSO_AdministratorAccess_f858ff41eadffbb9');
+        const gyangAdm = Role.fromRoleName(this, 'gyang-admin', 'AWSReservedSSO_AdministratorAccess_0629d3e576ce725f');
 
         // const pubIPs = ['67.80.162.234/32']
-        const pubIPs = ['67.80.162.234/32', CurrentEnver.inst.eksCluster.natPublicIP.getSharedValue(this) + '/32'];
+        const pubIPs = ['67.80.162.234/32', myEnver.natPublicIP.getSharedValue(this) + '/32'];
         this.eksCluster = new eks.Cluster(this, 'gyang-tst-eks-cluster', {
-            clusterName: CurrentEnver.inst.eksCluster.clusterName,
-            version: eks.KubernetesVersion.V1_29,
-            kubectlLayer: new KubectlV29Layer(this, 'kubectl'),
+            clusterName: myEnver.clusterName,
+            version: eks.KubernetesVersion.V1_31,
+            kubectlLayer: new KubectlV31Layer(this, 'kubectl'),
             vpc,
             secretsEncryptionKey: clusterKmsKey,
             placeClusterHandlerInVpc: true,
             // endpointAccess: eks.EndpointAccess.PRIVATE,
             endpointAccess: eks.EndpointAccess.PUBLIC_AND_PRIVATE.onlyFrom(...pubIPs),
             // mastersRole: gyangAdm,
-            albController: {version: eks.AlbControllerVersion.V2_6_2},
+            albController: {version: eks.AlbControllerVersion.V2_8_2},
             defaultCapacity: 1
         })
 
@@ -143,26 +141,26 @@ export class GyangEksCluster extends Stack {
             resolveConflicts: 'OVERWRITE',
             serviceAccountRoleArn: awsVpcCniRole.roleArn,
             clusterName: this.eksCluster.clusterName,
-            addonVersion: 'v1.16.0-eksbuild.1',
+            addonVersion: 'v1.19.2-eksbuild.1',
         })
         new eks.CfnAddon(this, 'kube-proxy', {
             addonName: 'kube-proxy',
             resolveConflicts: 'OVERWRITE',
             clusterName: this.eksCluster.clusterName,
-            addonVersion: 'v1.28.4-eksbuild.1',
+            addonVersion: 'v1.31.3-eksbuild.2',
         })
         new eks.CfnAddon(this, 'core-dns', {
             addonName: 'coredns',
             resolveConflicts: 'OVERWRITE',
             clusterName: this.eksCluster.clusterName,
-            addonVersion: 'v1.10.1-eksbuild.6',
+            addonVersion: 'v1.11.4-eksbuild.2',
         })
 
         new eks.CfnAddon(this, 'aws-ebs-csi-driver', {
             addonName: 'aws-ebs-csi-driver',
             resolveConflicts: 'OVERWRITE',
             clusterName: this.eksCluster.clusterName,
-            addonVersion: 'v1.26.0-eksbuild.1',
+            addonVersion: 'v1.39.0-eksbuild.1',
             serviceAccountRoleArn: new Role(this, 'csi-role', {
                 managedPolicies: [ManagedPolicy.fromManagedPolicyArn(this, 'csi-role-policy', 'arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy')],
                 assumedBy: eksOicp
@@ -225,42 +223,11 @@ export class GyangEksCluster extends Stack {
             },
         }).node.addDependency(extDnsSA)
 
-        this.argocdRepoName = OdmdNames.create(this);
-        this.argocdRepo = new Repository(this, 'argocd-repo', {
-            repositoryName: this.argocdRepoName,
-            // code: Code.fromDirectory('init-empty-cc-repo', 'dummy')
-        })
-
-        this.argoDefHelmOptions = {
-            namespace: CurrentEnver.inst.localConfig.argocdNamespace,
-            repository: 'https://argoproj.github.io/argo-helm',
-            chart: 'argo-cd',
-            version: '6.2.3',
-            release: CurrentEnver.inst.localConfig.argocdRelease,
-            values: {
-                repoServer: {
-                    serviceAccount: {
-                        create: false,
-                        name: CurrentEnver.inst.localConfig.argocdRepoSA,
-                        annotations: {},
-                        labels: {},
-                        automountServiceAccountToken: true,
-                    }
-                }
-            }
-        } as HelmChartOptions;
-        const argoDef = this.eksCluster.addHelmChart('argocd', this.argoDefHelmOptions)
-
-        this.argocdApps = new ArgocdApps(this, 'argocd-apps')
-        this.argocdApps.node.addDependency(argoDef, this.argocdRepo)
-
-        new ContractsShareOut(this, new Map<ContractsCrossRefProducer<AnyContractsEnVer>, string>([
-            [CurrentEnver.inst.eksCluster.oidcProviderArn, this.eksCluster.openIdConnectProvider.openIdConnectProviderArn],
-            [CurrentEnver.inst.eksCluster.clusterEndpoint, this.eksCluster.clusterEndpoint],
-            [CurrentEnver.inst.eksCluster.argocdRepoSa, CurrentEnver.inst.localConfig.argocdRepoSA!],
-            [CurrentEnver.inst.eksCluster.argocdRepoName, this.argocdRepo.repositoryName],
-            [CurrentEnver.inst.eksCluster.vpcCidr, vpc.vpcCidrBlock],
-            [CurrentEnver.inst.eksCluster.kubectlRoleArn, this.eksCluster.kubectlRole!.roleArn]
+        new OdmdShareOut(this, new Map<OdmdCrossRefProducer<OdmdEnverEksCluster>, string>([
+            [myEnver.oidcProviderArn, this.eksCluster.openIdConnectProvider.openIdConnectProviderArn],
+            [myEnver.clusterEndpoint, this.eksCluster.clusterEndpoint],
+            [myEnver.vpcCidr, vpc.vpcCidrBlock],
+            [myEnver.kubectlRoleArn, this.eksCluster.kubectlRole!.roleArn]
         ]))
 
         const clusterSGs = [
@@ -313,8 +280,8 @@ export class GyangEksCluster extends Stack {
             const r = clusterRoles[i] as Role;
             r.assumeRolePolicy!.addStatements(new PolicyStatement({
                 actions: ['sts:AssumeRole'],
-                principals: [new ArnPrincipal(`arn:aws:iam::${OndemandContracts.inst.accounts.central}:role/${
-                    CurrentEnver.inst.eksCluster.kubeTrustCentralRoleName
+                principals: [new ArnPrincipal(`arn:aws:iam::${OndemandContractsSandbox.inst.accounts.central}:role/${
+                    myEnver.kubeTrustCentralRoleName
                 }`)]
             }))
         }
