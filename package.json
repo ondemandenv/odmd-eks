@@ -9,10 +9,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk-ls": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..odmdSbxUsw1Gyang cdk ls --profile sandbox-workspace1",
-    "cdk-diff": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..odmdSbxUsw1Gyang cdk diff --all --profile sandbox-workspace1",
-    "cdk-sa": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..odmdSbxUsw1Gyang cdk synth '*' --profile sandbox-workspace1",
-    "kubectl": "ts-node bin/kubectl.ts"
+    "cdk-ls": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..main cdk ls --profile sandbox-workspace1",
+    "cdk-diff": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..main cdk diff --all --profile sandbox-workspace1",
+    "cdk-sa": "cross-env ODMD_build_id=eks-cluster-sbx ODMD_rev_ref=b..main cdk synth '*' --profile sandbox-workspace1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
@@ -28,7 +27,7 @@
     "base-64": "^1.0.0"
   },
   "dependencies": {
-    "@ondemandenv/odmd-contracts-sandbox": "0.0.67",
+    "@ondemandenv/odmd-contracts-sandbox": "0.0.78",
     "@aws-cdk/lambda-layer-kubectl-v31": "2.0.2",
     "aws-cdk-lib": "2.178.2",
     "cdk8s-plus-31": "^2.0.18",
