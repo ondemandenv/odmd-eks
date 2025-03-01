@@ -221,10 +221,14 @@ export class GyangEksCluster extends Stack {
         }).node.addDependency(extDnsSA)
 
         new OdmdShareOut(this, new Map<OdmdCrossRefProducer<OdmdEnverEksCluster>, string>([
+            //oidc Federated Principle
             [myEnver.oidcProviderArn, this.eksCluster.openIdConnectProvider.openIdConnectProviderArn],
             [myEnver.clusterEndpoint, this.eksCluster.clusterEndpoint],
             [myEnver.vpcCidr, vpc.vpcCidrBlock],
-            [myEnver.kubectlRoleArn, this.eksCluster.kubectlRole!.roleArn]
+            [myEnver.kubectlRoleArn, this.eksCluster.kubectlRole!.roleArn],
+
+            //nodes accessing ecr repo
+            [myEnver.defaultNodeGroupRoleArn, this.eksCluster.defaultNodegroup!.role.roleArn]
         ]))
 
         const clusterSGs = [
