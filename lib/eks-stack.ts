@@ -277,6 +277,11 @@ export class GyangEksCluster extends Stack {
         }
 
 
+        new CfnOutput(this, 'openIdConnectProviderArn', { value: this.eksCluster.openIdConnectProvider.openIdConnectProviderArn})
+        new CfnOutput(this, 'openIdConnectProviderIssuer', { value: this.eksCluster.openIdConnectProvider.openIdConnectProviderIssuer})
+
+
+
         for (let i = 0; i < clusterRoles.length; i++) {
             const r = clusterRoles[i] as Role;
             r.assumeRolePolicy!.addStatements(new PolicyStatement({
