@@ -46,9 +46,15 @@ jobs:
       - name: run enver local script
         run: |
           set -ex
-          cd ${{ env.ODMD_work_dir }}
-          env | grep -i ^ODMD
+          
+          if [[ -n "${{ env.ODMD_work_dir }}" ]]; then
+            cd "${{ env.ODMD_work_dir }}"
+          else
+            echo "ODMD_work_dir is empty, staying in current directory"
+          fi
+          
           pwd
+          env | grep -i ^ODMD
           
           if [ -f ${{ env.ODMD_buildScript }} ]; then
             chmod +x ${{ env.ODMD_buildScript }}
